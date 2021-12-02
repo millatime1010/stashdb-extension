@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="bulma.css">
+  </head>
+  <body>
+    <div class="box" style="padding: 1rem; margin-bottom: 0">
+      <div class="field">
+        <label class="label">Stash Address</label>
+        <div class="control">
+          <input id="address" class="input" type="text" placeholder="Stash Address (http://localhost:9999)" value="http://localhost:9999">
+        </div>
+      </div>
+    
+      <div class="field">
+        <label class="label">API Key</label>
+        <div class="control">
+          <input id="apiKey" class="input" type="text" placeholder="Stash API Key if using Authentication" value="">
+        </div>
+      </div>
+    
+      <button id="saveBtn" class="button is-primary">Save</button>
+    </div>    
+    <script src="settings.js"></script>
+  </body>
+</html>
