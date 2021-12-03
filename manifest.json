@@ -21,7 +21,10 @@
 		}
 	],
 	"web_accessible_resources": [{
-		"resources": ["images/green_check.svg", "images/red_x.svg"],
+		"resources": [
+			"images/green_check.svg", 
+			"images/red_x.svg",
+			"images/ignore.svg"],
 		"matches": ["https://stashdb.org/*"]
 	}
 		
