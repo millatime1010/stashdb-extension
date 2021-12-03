@@ -5,7 +5,7 @@ async function queryLocalStash(request) {
   const headers = {
     "Content-Type": "application/json"
   }
-  if(store.apiKey) {
+  if(store.apiKey && store.apiKey.length > 0) {
     headers["ApiKey"] = store.apiKey;
   }
 
