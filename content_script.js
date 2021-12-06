@@ -1,3 +1,5 @@
+let mutationObserverSetup = false;
+
 async function sleepUntil(f, timeoutMs) {
   return new Promise((resolve, reject) => {
     let timeWas = new Date();
@@ -50,6 +52,28 @@ async function run() {
     }, 10000);
   } catch(e) {
   }
+
+  if(!mutationObserverSetup) {
+    //setup a mutation observer if we are on the performers page.
+    //this may need to be adapted later for other pages.
+    if(location.href.includes("/performers/")) {
+      const tabContent = document.getElementsByClassName("tab-content")[0];
+      console.log(tabContent);
+      let observer = new MutationObserver(mutations => {
+        for(let mutation of mutations) {
+          for(let addedNode of mutation.addedNodes) {
+            if(addedNode.className === 'row' && mutationObserverSetup) {
+              run();
+            }
+          }
+        }
+      });
+      observer.observe(tabContent, { childList: true, subtree: true });
+      mutationObserverSetup = true;
+    }
+  }
+
+
 
   const query = `query FindSceneByStashId($id: String!) { \n findScenes(scene_filter: {stash_id: {value: $id, modifier: EQUALS}}) {\n    scenes {\n      title\n      stash_ids {\n        endpoint\n        stash_id\n      }\n      id    }\n  }\n}`
 
