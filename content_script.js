@@ -58,13 +58,25 @@ async function run() {
     //this may need to be adapted later for other pages.
     if(location.href.includes("/performers/")) {
       const tabContent = document.getElementsByClassName("tab-content")[0];
-      console.log(tabContent);
       let observer = new MutationObserver(mutations => {
-        for(let mutation of mutations) {
-          for(let addedNode of mutation.addedNodes) {
-            if(addedNode.className === 'row' && mutationObserverSetup) {
-              run();
+        if(mutationObserverSetup) {
+          for(let mutation of mutations) {
+            //console.log(mutation);
+            for(let addedNode of mutation.addedNodes) {
+              if(addedNode.nodeName === 'SPAN' && addedNode.id && addedNode.id === 'aria-context') {
+                console.log("run called!!");
+                run();
+              }
+              if(addedNode.className === 'row' && mutationObserverSetup) {
+                console.log("run called!!");
+                run();
+              }
             }
+              
+            /*for(let removedNode of mutation.removedNodes) {
+              if(removedNode.nodeName === 'SPAN' && removedNode.id && removedNode.id === 'aria-context')
+                run();
+            }*/
           }
         }
       });
