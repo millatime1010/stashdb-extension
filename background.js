@@ -19,19 +19,17 @@ async function queryLocalStash(request) {
   return results;
 }
 
-chrome.runtime.onInstalled.addListener(function() {
-  chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
-    if (changeInfo.status === 'complete') {
-      chrome.tabs.sendMessage(tabId, {
-        message: 'TabUpdated'
-      });
-    }
-  });
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  if (changeInfo.status === 'complete') {
+    chrome.tabs.sendMessage(tabId, {
+      message: 'TabUpdated'
+    });
+  }
+});
 
-  chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.msg == "queryLocalStash") {
-      queryLocalStash(request).then(sendResponse);
-    }
-    return true;
-  });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.msg == "queryLocalStash") {
+    queryLocalStash(request).then(sendResponse);
+  }
+  return true;
 });
