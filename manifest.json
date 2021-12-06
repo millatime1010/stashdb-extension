@@ -9,7 +9,7 @@
 		"storage"
     ],
 	"host_permissions": [
-        "*://localhost:*/*"
+        "*://*:*/*"
 	],
 	"background": {
 		"service_worker": "background.js"
