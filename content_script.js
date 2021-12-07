@@ -3,6 +3,25 @@ let isSearch = location.href.includes('/search/');
 let isPerformer = location.href.includes('/performers/');
 let isScene = location.href.includes('/scenes/');
 
+function debounce(func, wait, immediate) {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	};
+};
+
+const debounceRun = debounce(function() {
+  run();
+}, 200);
+
 async function sleepUntil(f, timeoutMs) {
   return new Promise((resolve, reject) => {
     let timeWas = new Date();
@@ -88,13 +107,18 @@ async function run() {
       let observer = new MutationObserver(mutations => {
         if(mutationObserverSetup) {
           for(let mutation of mutations) {
-            //console.log(mutation);
+            console.log(mutation);
             for(let addedNode of mutation.addedNodes) {
-              if(addedNode.nodeName === 'SPAN' && addedNode.id && addedNode.id === 'aria-context') {
-                run();
+              if(addedNode.nodeName === 'DIV' && addedNode.className === 'col-3 SceneCard') {
+                debounceRun();
               }
-              if(addedNode.className === 'row' && mutationObserverSetup) {
-                run();
+              if(addedNode.className === 'row') {
+                debounceRun();
+              }
+            }
+            for(let removedNode of mutation.removedNodes) {
+              if(removedNode.nodeName === 'DIV' && removedNode.className === 'col-3 SceneCard') {
+                debounceRun();
               }
             }
           }
