@@ -4,8 +4,7 @@
 
 1. Download the repo either through a git clone or as a zip. (Example pictured below).
 
-![image](https://user-images.githubusercontent.com/389870/144663511-5335fb9d-9d8e-44b2-aac2-bfba98cbfb48.png)
-
+![image](https://user-images.githubusercontent.com/95249619/145091284-0de3e84f-4b20-49b6-a6dd-7ceb05eefdb9.png)
 
 2. Open the Extension Management page by navigating to chrome://extensions.
    - Alternatively, open this page by clicking on the Extensions menu button and selecting Manage Extensions at the bottom of the menu.
