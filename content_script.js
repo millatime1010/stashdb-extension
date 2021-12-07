@@ -107,7 +107,6 @@ async function run() {
       let observer = new MutationObserver(mutations => {
         if(mutationObserverSetup) {
           for(let mutation of mutations) {
-            console.log(mutation);
             for(let addedNode of mutation.addedNodes) {
               if(addedNode.nodeName === 'DIV' && addedNode.className === 'col-3 SceneCard') {
                 debounceRun();
