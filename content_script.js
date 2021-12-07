@@ -1,6 +1,7 @@
 let mutationObserverSetup = false;
 let isSearch = location.href.includes('/search/');
-let isPerformer = location.href.includes('/performers/')
+let isPerformer = location.href.includes('/performers/');
+let isScene = location.href.includes('/scenes/');
 
 async function sleepUntil(f, timeoutMs) {
   return new Promise((resolve, reject) => {
@@ -22,8 +23,16 @@ async function sleepUntil(f, timeoutMs) {
 
 function ignoreScene(linkElement, replaceIcon) {
   linkElement.addClass("stash_id_ignored");
-  const cardElement = isSearch ? linkElement.find(".card") : linkElement.parents(".card");
-  const sceneImage = isSearch ? cardElement.find(".SearchPage-scene-image") : cardElement.find(".SceneCard-image");
+  const cardElement = (isSearch || isScene) ? linkElement.find(".card") : linkElement.parents(".card");
+  
+  let sceneImage = cardElement.find(".SceneCard-image");
+
+  if (isSearch) {
+    sceneImage = cardElement.find(".SearchPage-scene-image");
+  }
+  if (isScene) {
+    sceneImage = cardElement.find(".scene-photo-element");
+  }
 
   sceneImage.css("opacity", ".25");
   cardElement.css("background-color", "rgba(48, 64, 77, 0.25)");
@@ -36,8 +45,16 @@ function ignoreScene(linkElement, replaceIcon) {
 
 function clearIgnore(linkElement) {
   linkElement.removeClass("stash_id_ignored");
-  const cardElement = isSearch ? linkElement.find(".card") : linkElement.parents(".card");
-  const sceneImage = isSearch? cardElement.find(".SearchPage-scene-image") : cardElement.find(".SceneCard-image");
+  const cardElement = (isSearch || isScene) ? linkElement.find(".card") : linkElement.parents(".card");
+
+  let sceneImage = cardElement.find(".SceneCard-image");
+
+  if (isSearch) {
+    sceneImage = cardElement.find(".SearchPage-scene-image");
+  }
+  if (isScene) {
+    sceneImage = cardElement.find(".scene-photo-element");
+  }
 
   sceneImage.css("opacity", "1");
   cardElement.css("background-color", "rgba(48, 64, 77, 1)");
@@ -54,7 +71,9 @@ async function run() {
     await sleepUntil(() => {
       if(isSearch) {
         return $(".SearchPage-scene").length > 0;
-      } else {
+      } else if(isScene) {
+        return $(".scene-info").length > 0;
+      } {
         return $(".row .SceneCard").length > 0;
       }
     }, 10000);
@@ -88,17 +107,32 @@ async function run() {
 
   const query = `query FindSceneByStashId($id: String!) { \n findScenes(scene_filter: {stash_id: {value: $id, modifier: EQUALS}}) {\n    scenes {\n      title\n      stash_ids {\n        endpoint\n        stash_id\n      }\n      id    }\n  }\n}`
 
-  const sceneCardList = isSearch ? $(".SearchPage-scene") : $(".row .SceneCard");
+  let sceneCardList =  $(".row .SceneCard");
+
+  if (isSearch) {
+    sceneCardList = $(".SearchPage-scene");
+  }
+  if (isScene) {
+    sceneCardList = $(".StashDBContent");
+  }
 
   for(let ndx = 0; ndx < sceneCardList.length; ++ndx) {
-    const linkElement = isSearch ? $(sceneCardList[ndx]) : $(sceneCardList[ndx]).find('.d-flex');
-    const linkHref = linkElement.attr('href');
-    const id = linkHref.split('/')[2];
+    const linkElement = (isSearch || isScene) ? $(sceneCardList[ndx]) : $(sceneCardList[ndx]).find('.d-flex');
+
+    let id = null;
+
+    if(isScene) {
+      id = location.href.slice(location.href.lastIndexOf('/') + 1);
+    } else {
+      const linkHref = linkElement.attr('href');
+      id = linkHref.split('/')[2];
+    }
 
     chrome.runtime.sendMessage({msg: "queryLocalStash", query: { query, variables: { id } } }, results => {
         
       let display = isSearch ?  $("<div>", { class: "stash_id_match", style: "position: absolute; top: 10px; right: 5px;"}) : 
-                                $("<div>", { class: "stash_id_match", style: "position: relative; margin-left: 10px"})
+                                $("<div>", { class: "stash_id_match", style: "position: relative; margin-left: 10px; cursor: pointer"})
+
       let new_link = $("<a>");
       let new_image = $("<img>", { style: "height: 20px; width: 20px;"});
       display.append(new_link);
@@ -185,8 +219,11 @@ async function run() {
         }
       );
       linkElement.find('.stash_id_match').remove();
+
       if (isSearch) {
         linkElement.find(".card h5").append(display);
+      } else if(isScene) {
+        linkElement.find(".card-header .float-right").append(display);
       } else {
         linkElement.append(display);
       }
@@ -198,7 +235,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'TabUpdated') {
     mutationObserverSetup = false;
     isSearch = location.href.includes('/search/');
-    isPerformer = location.href.includes('/performers/')
+    isPerformer = location.href.includes('/performers/');
+    isScene = location.href.includes('/scenes/')
     run();
   }
 });
