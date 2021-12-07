@@ -1,4 +1,6 @@
 let mutationObserverSetup = false;
+let isSearch = location.href.includes('/search/');
+let isPerformer = location.href.includes('/performers/')
 
 async function sleepUntil(f, timeoutMs) {
   return new Promise((resolve, reject) => {
@@ -20,8 +22,9 @@ async function sleepUntil(f, timeoutMs) {
 
 function ignoreScene(linkElement, replaceIcon) {
   linkElement.addClass("stash_id_ignored");
-  const cardElement = linkElement.parents(".card");
-  const sceneImage = cardElement.find(".SceneCard-image");
+  const cardElement = isSearch ? linkElement.find(".card") : linkElement.parents(".card");
+  const sceneImage = isSearch ? cardElement.find(".SearchPage-scene-image") : cardElement.find(".SceneCard-image");
+
   sceneImage.css("opacity", ".25");
   cardElement.css("background-color", "rgba(48, 64, 77, 0.25)");
 
@@ -33,8 +36,9 @@ function ignoreScene(linkElement, replaceIcon) {
 
 function clearIgnore(linkElement) {
   linkElement.removeClass("stash_id_ignored");
-  const cardElement = linkElement.parents(".card");
-  const sceneImage = cardElement.find(".SceneCard-image");
+  const cardElement = isSearch ? linkElement.find(".card") : linkElement.parents(".card");
+  const sceneImage = isSearch? cardElement.find(".SearchPage-scene-image") : cardElement.find(".SceneCard-image");
+
   sceneImage.css("opacity", "1");
   cardElement.css("background-color", "rgba(48, 64, 77, 1)");
   const imageElement = linkElement.find(".stash_id_match img");
@@ -48,15 +52,19 @@ async function run() {
  
   try {
     await sleepUntil(() => {
-      return $(".row .SceneCard").length > 0
+      if(isSearch) {
+        return $(".SearchPage-scene").length > 0;
+      } else {
+        return $(".row .SceneCard").length > 0;
+      }
     }, 10000);
   } catch(e) {
   }
 
-  if(!mutationObserverSetup) {
-    //setup a mutation observer if we are on the performers page.
-    //this may need to be adapted later for other pages.
-    if(location.href.includes("/performers/")) {
+  if(isPerformer) {
+    if(!mutationObserverSetup) {
+      //setup a mutation observer if we are on the performers page.
+      //this may need to be adapted later for other pages.
       const tabContent = document.getElementsByClassName("tab-content")[0];
       let observer = new MutationObserver(mutations => {
         if(mutationObserverSetup) {
@@ -64,19 +72,12 @@ async function run() {
             //console.log(mutation);
             for(let addedNode of mutation.addedNodes) {
               if(addedNode.nodeName === 'SPAN' && addedNode.id && addedNode.id === 'aria-context') {
-                console.log("run called!!");
                 run();
               }
               if(addedNode.className === 'row' && mutationObserverSetup) {
-                console.log("run called!!");
                 run();
               }
             }
-              
-            /*for(let removedNode of mutation.removedNodes) {
-              if(removedNode.nodeName === 'SPAN' && removedNode.id && removedNode.id === 'aria-context')
-                run();
-            }*/
           }
         }
       });
@@ -85,20 +86,19 @@ async function run() {
     }
   }
 
-
-
   const query = `query FindSceneByStashId($id: String!) { \n findScenes(scene_filter: {stash_id: {value: $id, modifier: EQUALS}}) {\n    scenes {\n      title\n      stash_ids {\n        endpoint\n        stash_id\n      }\n      id    }\n  }\n}`
 
-  const sceneCardList = $(".row .SceneCard");
+  const sceneCardList = isSearch ? $(".SearchPage-scene") : $(".row .SceneCard");
 
   for(let ndx = 0; ndx < sceneCardList.length; ++ndx) {
-    const linkElement = $(sceneCardList[ndx]).find('.d-flex');
+    const linkElement = isSearch ? $(sceneCardList[ndx]) : $(sceneCardList[ndx]).find('.d-flex');
     const linkHref = linkElement.attr('href');
     const id = linkHref.split('/')[2];
 
     chrome.runtime.sendMessage({msg: "queryLocalStash", query: { query, variables: { id } } }, results => {
         
-      let display = $("<div>", { class: "stash_id_match", style: "position: relative; margin-left: 10px"})
+      let display = isSearch ?  $("<div>", { class: "stash_id_match", style: "position: absolute; top: 10px; right: 5px;"}) : 
+                                $("<div>", { class: "stash_id_match", style: "position: relative; margin-left: 10px"})
       let new_link = $("<a>");
       let new_image = $("<img>", { style: "height: 20px; width: 20px;"});
       display.append(new_link);
@@ -185,13 +185,20 @@ async function run() {
         }
       );
       linkElement.find('.stash_id_match').remove();
-      linkElement.append(display);
+      if (isSearch) {
+        linkElement.find(".card h5").append(display);
+      } else {
+        linkElement.append(display);
+      }
     });
   }
 }
 
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   if (request.message === 'TabUpdated') {
+    mutationObserverSetup = false;
+    isSearch = location.href.includes('/search/');
+    isPerformer = location.href.includes('/performers/')
     run();
   }
 });

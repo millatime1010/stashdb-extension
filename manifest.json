@@ -1,35 +1,43 @@
 {
-	"name": "stashdb-extension",
-	"version": "0.1",
-	"manifest_version": 3,
-	"permissions": [
-        "background",
-        "activeTab",
-        "tabs",
-		"storage"
-    ],
-	"host_permissions": [
-        "*://*:*/*"
-	],
-	"background": {
-		"service_worker": "background.js"
-	},
-	"content_scripts": [
-		{
-			"matches": ["https://stashdb.org/*"],
-			"js": ["lib/jquery.min.js", "content_script.js"]
-		}
-	],
-	"web_accessible_resources": [{
-		"resources": [
-			"images/green_check.svg", 
-			"images/red_x.svg",
-			"images/ignore.svg"],
-		"matches": ["https://stashdb.org/*"]
-	}
-		
-	],
-	"action": {
-		"default_popup": "settings/settings.html"
-	}
+  "name": "stashdb-extension",
+  "version": "0.1",
+  "manifest_version": 3,
+  "permissions": [
+    "background",
+    "activeTab",
+    "tabs",
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*:*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://stashdb.org/*"
+      ],
+      "js": [
+        "lib/jquery.min.js",
+        "content_script.js"
+      ]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "images/green_check.svg",
+        "images/red_x.svg",
+        "images/ignore.svg"
+      ],
+      "matches": [
+        "https://stashdb.org/*"
+      ]
+    }
+  ],
+  "action": {
+    "default_popup": "settings/settings.html"
+  }
 }
