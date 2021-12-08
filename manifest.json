@@ -21,6 +21,8 @@
       ],
       "js": [
         "lib/jquery.min.js",
+        "lib/common.js",
+        "lib/scene.js",
         "content_script.js"
       ]
     }
