@@ -6,7 +6,8 @@
     "background",
     "activeTab",
     "tabs",
-    "storage"
+    "storage",
+    "unlimitedStorage"
   ],
   "host_permissions": [
     "*://*:*/*"
