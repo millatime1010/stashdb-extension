@@ -25,6 +25,9 @@
         "lib/common.js",
         "lib/scene.js",
         "content_script.js"
+      ],
+      "css": [
+        "lib/scene.css"
       ]
     }
   ],
@@ -33,7 +36,8 @@
       "resources": [
         "images/green_check.svg",
         "images/red_x.svg",
-        "images/ignore.svg"
+        "images/ignore.svg",
+        "images/yellow_star.svg"
       ],
       "matches": [
         "https://stashdb.org/*"

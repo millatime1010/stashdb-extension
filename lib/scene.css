@@ -1,0 +1,8 @@
+a:hover {
+  background-color: rgba(0, 0, 0, 0.541);
+  color: #fff !important;
+}
+
+.float-end {
+    display: flex;
+}
