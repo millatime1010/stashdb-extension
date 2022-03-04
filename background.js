@@ -1,6 +1,9 @@
 async function queryLocalStash(request) {
   const store = await chrome.storage.sync.get();
-  const address = store.address ? store.address : "http://localhost:9999";
+  let address = store.address ? store.address : "http://localhost:9999";
+  if(address.endsWith("/")) {
+    address = address.slice(0, -1);
+  }
 
   const headers = {
     "Content-Type": "application/json"
